@@ -1,0 +1,6 @@
+echo .env > .gitignore
+echo venv/ >> .gitignore
+echo __pycache__/ >> .gitignore
+echo *.pyc >> .gitignore
+echo data/chroma_store/ >> .gitignore
+echo *.pkl >> .gitignore
