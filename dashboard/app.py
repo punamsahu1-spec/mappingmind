@@ -60,22 +60,17 @@ with tab1:
             st.error("Run ingestion first: python -m core.ingest")
             st.stop()
 
-        from core.generation import ask_mappingmind
+        from core.agent import ask_agent
 
         filter_val = None if system_filter == "All Systems" else system_filter
 
         with st.spinner("Searching mapping knowledge base..."):
-            result = ask_mappingmind(query, system_filter=filter_val)
-
-        guards = result["guardrails"]
+            result = ask_agent(query)
 
         # Blocked queries
-        if guards.get("injection", {}).get("blocked"):
-            st.error(f"⛔ {result['answer']}")
-            st.stop()
-
-        if not guards.get("domain", {}).get("in_scope", True):
-            st.warning(f"❓ {result['answer']}")
+        answer = result.get("answer", "")
+        if answer.startswith("⛔") or answer.startswith("❓"):
+            st.warning(answer)
             st.stop()
 
         # Answer
@@ -93,26 +88,26 @@ with tab1:
         # Metrics
         st.divider()
         st.subheader("📊 Query Metrics")
-        metrics = result["metrics"]
-        m1, m2, m3, m4, m5 = st.columns(5)
-        m1.metric("Latency", f"{metrics.get('latency_sec', 0)}s")
-        m2.metric("Tokens In", metrics.get('tokens_in', 0))
-        m3.metric("Tokens Out", metrics.get('tokens_out', 0))
-        m4.metric("Sources Found", metrics.get('chunks_retrieved', 0))
-        m5.metric("Grounding", f"{metrics.get('hallucination_score', 0):.0%}")
+       
+        m1, m2, m3 = st.columns(3)
+        m1.metric("Sources Found", len(result.get('sources', [])))
+        m2.metric("Grounding", f"{result.get('hallucination_score', 0):.0%}")
+        m3.metric("Query Rewrites", result.get('rewrites', 0))
+
+        # Agent trace
+        st.divider()
+        st.subheader("🤖 Agent Decision Trail")
+        for step in result.get('agent_trace', []):
+         st.caption(f"→ {step}")
 
         # Guardrail status
         st.divider()
         st.subheader("🛡️ Guardrail Status")
-        g1, g2, g3, g4 = st.columns(4)
-        g1.metric("Injection Guard", "✅ Passed")
-        g2.metric("Domain Guard", "✅ In Scope")
-        g3.metric("Confidence", 
-                  "✅ Passed" if guards.get("confidence", {}).get("passed") else "⚠️ Low")
-        hall_score = guards.get("hallucination", {}).get("score", 0)
-        g4.metric("Hallucination", 
-                  f"{'✅' if hall_score > 0.5 else '⚠️'} {hall_score:.0%}")
-
+        hall_score = result.get("hallucination_score", 0)
+        g1, g2, g3 = st.columns(3)
+        g1.metric("Guardrails", "✅ Passed")
+        g2.metric("Grounding", f"{'✅' if hall_score > 0.5 else '⚠️'} {hall_score:.0%}")
+        g3.metric("Rewrites", result.get('rewrites', 0))
 # ── TAB 2: ANALYTICS ──────────────────────────────────────────────
 with tab2:
     st.header("📊 Business Impact Dashboard")
