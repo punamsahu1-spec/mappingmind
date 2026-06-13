@@ -1,0 +1,21 @@
+source_field,target_field,transformation,rationale,system,year,status
+cust_acct_bal,account_balance_usd,"CAST(cust_acct_bal/100 AS DECIMAL(18,2))","Source stores balance in minor currency units. Divide by 100 for USD normalization.",CoreBanking_v1,2021,approved
+customer_id,client_reference_id,"TRIM(UPPER(customer_id))","Standardize to uppercase for cross-system join keys.",CRM_Oracle,2021,approved
+txn_dt,transaction_date,"TO_DATE(txn_dt, 'YYYYMMDD')","Source uses integer date format YYYYMMDD. Convert to standard DATE type.",PaymentSystem_v2,2022,approved
+acct_type_cd,account_type_description,"CASE WHEN acct_type_cd='S' THEN 'Savings' WHEN acct_type_cd='C' THEN 'Current' ELSE 'Unknown' END","Source uses single-char codes. Target needs full description for reporting.",CoreBanking_v1,2021,approved
+cust_dob,date_of_birth,"TO_DATE(cust_dob, 'DD-MON-YYYY')","Source date format inconsistent. Standardize to ISO 8601.",CRM_Oracle,2022,approved
+branch_cd,branch_code,"LPAD(branch_cd, 6, '0')","Target requires 6-digit zero-padded branch codes for SWIFT compliance.",CoreBanking_v2,2023,approved
+mobile_no,mobile_number,"REGEXP_REPLACE(mobile_no, '[^0-9]', '')","Remove non-numeric characters. Source includes hyphens and spaces.",CRM_SAP,2023,approved
+loan_amt,loan_amount_usd,"CAST(loan_amt AS DECIMAL(18,2))","Direct cast. Source already in USD units confirmed by SME.",LoanSystem_v1,2022,approved
+int_rate,interest_rate_percent,"ROUND(int_rate * 100, 4)","Source stores as decimal (0.0525). Target expects percentage (5.25).",LoanSystem_v1,2022,approved
+emp_id,employee_reference,"CONCAT('EMP-', LPAD(emp_id, 8, '0'))","Add prefix and pad for HR system compatibility.",HRMS_Oracle,2023,approved
+addr_line1,address_line_1,"INITCAP(TRIM(addr_line1))","Normalize case. Source has mixed case from legacy entry.",CRM_Oracle,2021,approved
+zip_cd,postal_code,"CASE WHEN LENGTH(zip_cd)=5 THEN zip_cd WHEN LENGTH(zip_cd)=9 THEN SUBSTR(zip_cd,1,5) ELSE NULL END","Handle both 5 and 9 digit ZIP formats.",CRM_SAP,2022,approved
+acct_open_dt,account_open_date,"TO_DATE(acct_open_dt, 'MM/DD/YYYY')","Source uses US date format. Convert to ISO 8601.",CoreBanking_v2,2023,approved
+ccy_cd,currency_code,"UPPER(TRIM(ccy_cd))","Standardize to ISO 4217 uppercase currency codes.",PaymentSystem_v2,2022,approved
+risk_score,risk_rating,"CASE WHEN risk_score < 30 THEN 'Low' WHEN risk_score < 70 THEN 'Medium' ELSE 'High' END","Convert numeric score to categorical rating for reporting.",RiskSystem_v1,2023,approved
+cust_seg,customer_segment,"INITCAP(LOWER(cust_seg))","Normalize segment labels from source system inconsistencies.",CRM_SAP,2023,approved
+bal_dt,balance_date,"LAST_DAY(TO_DATE(bal_dt,'YYYYMM'))","Source provides year-month only. Use last day of month for balance reporting.",CoreBanking_v1,2021,approved
+prod_cd,product_code,"TRIM(prod_cd)","Remove trailing spaces from legacy fixed-width source.",LoanSystem_v1,2022,approved
+txn_amt,transaction_amount_usd,"ABS(CAST(txn_amt AS DECIMAL(18,2)))","Source allows negative for debits. Target uses separate debit/credit flag.",PaymentSystem_v2,2023,approved
+kyc_status,kyc_verified,"CASE WHEN kyc_status='Y' THEN TRUE WHEN kyc_status='N' THEN FALSE ELSE NULL END","Convert Y/N flag to boolean for target schema.",CRM_Oracle,2023,approved
