@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from core.agent import ask_agent
 from core.audit import write_audit_event
+from core.cache import get_cached_answer, save_answer_to_cache
 
 load_dotenv()
 
@@ -34,7 +35,6 @@ def root():
     return {
         "service": "MappingMind",
         "version": "1.0.0",
-        "description": "Enterprise Data Mapping Intelligence powered by Agentic RAG",
         "docs": "/docs",
         "health": "/health",
     }
@@ -50,12 +50,33 @@ def health():
 
 @app.post("/ask")
 def ask(request: AskRequest):
-    """
-    Ask MappingMind a data-mapping question.
+    cached_result = get_cached_answer(request.query)
 
-    Flow:
-    query -> guardrails -> hybrid retrieval -> reranking -> agentic validation -> answer
-    """
+    if cached_result:
+        decision = "cache_hit"
+
+        write_audit_event(
+            {
+                "user_id": request.user_id,
+                "query": request.query,
+                "system_filter": request.system_filter,
+                "answer": cached_result.get("answer", ""),
+                "sources": cached_result.get("sources", []),
+                "agent_trace": cached_result.get("agent_trace", []),
+                "hallucination_score": cached_result.get("hallucination_score", None),
+                "rewrites": cached_result.get("rewrites", 0),
+                "cache_hit": True,
+                "cache_similarity": cached_result.get("cache_similarity"),
+                "cached_from_query": cached_result.get("cached_from_query"),
+                "decision": decision,
+            }
+        )
+
+        return {
+            **cached_result,
+            "decision": decision,
+        }
+
     result = ask_agent(request.query)
 
     answer = result.get("answer", "")
@@ -71,6 +92,14 @@ def ask(request: AskRequest):
     if "blocked" in answer.lower() or "prompt injection" in answer.lower():
         decision = "blocked"
 
+    result = {
+        **result,
+        "cache_hit": False,
+        "decision": decision,
+    }
+
+    save_answer_to_cache(request.query, result)
+
     write_audit_event(
         {
             "user_id": request.user_id,
@@ -81,12 +110,9 @@ def ask(request: AskRequest):
             "agent_trace": agent_trace,
             "hallucination_score": hallucination_score,
             "rewrites": result.get("rewrites", 0),
-            "cache_hit": result.get("cache_hit", False),
+            "cache_hit": False,
             "decision": decision,
         }
     )
 
-    return {
-        **result,
-        "decision": decision,
-    }
+    return result
