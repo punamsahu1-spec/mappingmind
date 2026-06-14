@@ -21,7 +21,7 @@ from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
-from sentence_transformers import CrossEncoder
+from sentence_transformers import CrossEncoder, SentenceTransformer, util
 from rank_bm25 import BM25Okapi
 import chromadb
 import numpy as np
@@ -116,7 +116,84 @@ def rerank(query: str, results: list[tuple[Document, float]], top_k: int = 5) ->
     )
     return reranked[:top_k]
 
+# ── MMR DIVERSITY SELECTION ────────────────────────────────────────
+# Maximal Marginal Relevance:
+# keeps results relevant to query, but avoids near-duplicate chunks.
+# Production pattern: rerank for precision, then MMR for diverse evidence.
+_mmr_model = SentenceTransformer("all-MiniLM-L6-v2")
 
+
+def apply_mmr_diversity(
+    query: str,
+    results: list[tuple[Document, float]],
+    top_k: int = 5,
+    lambda_mult: float = 0.7,
+) -> list[tuple[Document, float]]:
+    """
+    Apply Maximal Marginal Relevance on reranked results.
+
+    lambda_mult closer to 1.0 = prioritize relevance.
+    lambda_mult closer to 0.0 = prioritize diversity.
+    """
+
+    if not results or len(results) <= top_k:
+        return results
+
+    docs = [doc for doc, _ in results]
+    scores = [score for _, score in results]
+    texts = [doc.page_content for doc in docs]
+
+    query_embedding = _mmr_model.encode(query, convert_to_tensor=True)
+    doc_embeddings = _mmr_model.encode(texts, convert_to_tensor=True)
+
+    query_similarities = util.cos_sim(query_embedding, doc_embeddings)[0]
+
+    selected_indices = []
+    candidate_indices = list(range(len(results)))
+
+    first_index = int(query_similarities.argmax())
+    selected_indices.append(first_index)
+    candidate_indices.remove(first_index)
+
+    while candidate_indices and len(selected_indices) < top_k:
+        best_score = -999
+        best_index = None
+
+        for idx in candidate_indices:
+            relevance_score = float(query_similarities[idx])
+
+            selected_embeddings = doc_embeddings[selected_indices]
+            diversity_penalty = float(
+                util.cos_sim(doc_embeddings[idx], selected_embeddings).max()
+            )
+
+            mmr_score = (
+                lambda_mult * relevance_score
+                - (1 - lambda_mult) * diversity_penalty
+            )
+
+            if mmr_score > best_score:
+                best_score = mmr_score
+                best_index = idx
+
+        selected_indices.append(best_index)
+        candidate_indices.remove(best_index)
+
+    diversified_results = []
+
+    for mmr_rank, idx in enumerate(selected_indices, start=1):
+        doc = docs[idx]
+        original_score = scores[idx]
+
+        doc.metadata = {
+            **doc.metadata,
+            "mmr_rank": mmr_rank,
+            "mmr_enabled": True,
+        }
+
+        diversified_results.append((doc, original_score))
+
+    return diversified_results
 # ── METADATA FILTER ────────────────────────────────────────────────
 # Production feature: filter by system, year, status BEFORE search
 # Reduces noise — user only sees approved mappings from relevant system
@@ -166,16 +243,25 @@ def retrieve(
     fused = rrf_fusion(bm25_results, semantic_results)
     print(f"✅ RRF fusion: {len(fused)} results")
 
-    # Step 4: Rerank
-    reranked = rerank(query, fused[:10], top_k=top_k)
+        # Step 4: Rerank
+    reranked = rerank(query, fused[:10], top_k=min(len(fused), 10))
     print(f"✅ Reranked: top {len(reranked)} results")
 
-    for i, (doc, score) in enumerate(reranked):
-        print(f"\n  [{i+1}] Score: {score:.3f}")
-        print(f"       {doc.page_content[:100]}...")
+    # Step 5: MMR diversity selection
+    diversified = apply_mmr_diversity(
+        query=query,
+        results=reranked,
+        top_k=top_k,
+        lambda_mult=0.7,
+    )
+    print(f"✅ MMR diversity: top {len(diversified)} results")
 
-    return reranked
+    for i, (doc, score) in enumerate(diversified):
+        print(f"\n [{i+1}] Score: {score:.3f}")
+        print(f" MMR Rank: {doc.metadata.get('mmr_rank')}")
+        print(f" {doc.page_content[:100]}...")
 
+    return diversified
 
 if __name__ == "__main__":
     results = retrieve("How should we map a customer balance field from CoreBanking?")
