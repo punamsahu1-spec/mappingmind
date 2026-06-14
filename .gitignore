@@ -1,11 +1,4 @@
-echo .env >> .gitignore
-echo .env.* >> .gitignore
-echo !.env.example >> .gitignore
-echo venv/ >> .gitignore
-echo .venv/ >> .gitignore
-echo __pycache__/ >> .gitignore
-echo *.pyc >> .gitignore
-echo data/chroma_store/ >> .gitignore
-echo *.pkl >> .gitignore
-echo logs/ >> .gitignore
-echo data/semantic_cache.json >> .gitignore
+GOOGLE_API_KEY=your_google_api_key_here
+LANGSMITH_API_KEY=your_langsmith_api_key_here
+LANGSMITH_PROJECT=mappingmind
+LANGCHAIN_TRACING_V2=true
