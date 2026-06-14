@@ -1,181 +1,221 @@
-"""
-MappingMind — Leadership Dashboard
-====================================
-Run: streamlit run dashboard/app.py
-"""
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT_DIR))
 
 import streamlit as st
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from core.agent import ask_agent
+from core.audit import read_recent_audit_events, write_audit_event
+from core.cache import get_cached_answer, save_answer_to_cache
 
 st.set_page_config(
     page_title="MappingMind",
     page_icon="🧠",
-    layout="wide"
+    layout="wide",
 )
 
+
+def decide_status(answer: str) -> str:
+    answer_lower = answer.lower()
+
+    if "requires sme review" in answer_lower or "sme review" in answer_lower:
+        return "human_review"
+
+    if "blocked" in answer_lower or "prompt injection" in answer_lower:
+        return "blocked"
+
+    return "answered"
+
+
+def show_sources(sources):
+    if not sources:
+        st.info("No sources returned.")
+        return
+
+    for i, source in enumerate(sources, start=1):
+        if isinstance(source, dict):
+            st.markdown(f"**Source {i}**")
+            st.json(source)
+        else:
+            st.markdown(f"**Source {i}:** {source}")
+
+
+def show_agent_trace(agent_trace):
+    if not agent_trace:
+        st.info("No agent trace returned.")
+        return
+
+    for step in agent_trace:
+        st.write(f"✅ {step}")
+
+
+def ask_mappingmind(query: str, user_id: str, system_filter: str | None):
+    """
+    Dashboard flow:
+    semantic cache -> agentic RAG -> cache save -> audit log
+    """
+
+    cached_result = get_cached_answer(query)
+
+    if cached_result:
+        decision = "cache_hit"
+
+        write_audit_event(
+            {
+                "user_id": user_id,
+                "query": query,
+                "system_filter": system_filter,
+                "answer": cached_result.get("answer", ""),
+                "sources": cached_result.get("sources", []),
+                "agent_trace": cached_result.get("agent_trace", []),
+                "hallucination_score": cached_result.get("hallucination_score", None),
+                "rewrites": cached_result.get("rewrites", 0),
+                "cache_hit": True,
+                "cache_similarity": cached_result.get("cache_similarity"),
+                "cached_from_query": cached_result.get("cached_from_query"),
+                "decision": decision,
+            }
+        )
+
+        return {
+            **cached_result,
+            "decision": decision,
+        }
+
+    result = ask_agent(query)
+
+    answer = result.get("answer", "")
+    decision = decide_status(answer)
+
+    result = {
+        **result,
+        "cache_hit": False,
+        "decision": decision,
+    }
+
+    save_answer_to_cache(query, result)
+
+    write_audit_event(
+        {
+            "user_id": user_id,
+            "query": query,
+            "system_filter": system_filter,
+            "answer": result.get("answer", ""),
+            "sources": result.get("sources", []),
+            "agent_trace": result.get("agent_trace", []),
+            "hallucination_score": result.get("hallucination_score", None),
+            "rewrites": result.get("rewrites", 0),
+            "cache_hit": False,
+            "decision": decision,
+        }
+    )
+
+    return result
+
 st.title("🧠 MappingMind")
-st.caption("Enterprise Data Mapping Intelligence — Powered by Agentic RAG")
+st.caption("Enterprise Data Mapping Intelligence — Powered by Production Agentic RAG")
 
-tab1, tab2, tab3 = st.tabs([
-    "💬 Ask MappingMind",
-    "📊 Analytics",
-    "📚 Knowledge Base"
-])
+st.markdown(
+    """
+    MappingMind helps data teams answer enterprise mapping questions using hybrid search,
+    reranking, grounded generation, guardrails, semantic cache, and audit logging.
+    """
+)
 
-# ── TAB 1: QUERY ──────────────────────────────────────────────────
-with tab1:
-    st.header("Ask MappingMind")
-    st.markdown("*Ask about any data mapping decision, transformation pattern, or past integration.*")
+with st.sidebar:
+    st.header("Demo Controls")
 
-    col1, col2 = st.columns([2, 1])
-
-    with col1:
-        query = st.text_area(
-            "Your question:",
-            value="How should we map customer_account_balance from CoreBanking system?",
-            height=100
-        )
-        system_filter = st.selectbox(
-            "Filter by system (optional):",
-            ["All Systems", "CoreBanking_v1", "CoreBanking_v2",
-             "CRM_Oracle", "CRM_SAP", "PaymentSystem_v2",
-             "LoanSystem_v1", "HRMS_Oracle"]
-        )
-
-    with col2:
-        st.subheader("💡 Example Questions")
-        st.markdown("""
-        - How to map balance fields from CoreBanking?
-        - What is standard date transformation?
-        - How have we handled currency normalization?
-        - What mapping patterns should we avoid?
-        - How to map customer ID fields?
-        """)
-
-    if st.button("🔍 Get Mapping Recommendation", type="primary"):
-
-        if not os.path.exists("data/chunks_cache.pkl"):
-            st.error("Run ingestion first: python -m core.ingest")
-            st.stop()
-
-        from core.agent import ask_agent
-
-        filter_val = None if system_filter == "All Systems" else system_filter
-
-        with st.spinner("Searching mapping knowledge base..."):
-            result = ask_agent(query)
-
-        # Blocked queries
-        answer = result.get("answer", "")
-        if answer.startswith("⛔") or answer.startswith("❓"):
-            st.warning(answer)
-            st.stop()
-
-        # Answer
-        st.divider()
-        st.subheader("📋 Mapping Recommendation")
-        st.markdown(result["answer"])
-
-        # Sources
-        if result["sources"]:
-            st.subheader("📎 Sources")
-            cols = st.columns(len(result["sources"]))
-            for i, source in enumerate(result["sources"]):
-                cols[i].info(source)
-
-        # Metrics
-        st.divider()
-        st.subheader("📊 Query Metrics")
-       
-        m1, m2, m3 = st.columns(3)
-        m1.metric("Sources Found", len(result.get('sources', [])))
-        m2.metric("Grounding", f"{result.get('hallucination_score', 0):.0%}")
-        m3.metric("Query Rewrites", result.get('rewrites', 0))
-
-        # Agent trace
-        st.divider()
-        st.subheader("🤖 Agent Decision Trail")
-        for step in result.get('agent_trace', []):
-         st.caption(f"→ {step}")
-
-        # Guardrail status
-        st.divider()
-        st.subheader("🛡️ Guardrail Status")
-        hall_score = result.get("hallucination_score", 0)
-        g1, g2, g3 = st.columns(3)
-        g1.metric("Guardrails", "✅ Passed")
-        g2.metric("Grounding", f"{'✅' if hall_score > 0.5 else '⚠️'} {hall_score:.0%}")
-        g3.metric("Rewrites", result.get('rewrites', 0))
-# ── TAB 2: ANALYTICS ──────────────────────────────────────────────
-with tab2:
-    st.header("📊 Business Impact Dashboard")
-    st.caption("Projected metrics based on MappingMind adoption")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader("💰 ROI Summary")
-        r1, r2 = st.columns(2)
-        r1.metric("Time per Integration", "30 min", delta="-2.5 days")
-        r2.metric("Annual Cost Saved", "$82,000", delta="-97%")
-        r1.metric("Support Tickets/yr", "<5", delta="-75 tickets")
-        r2.metric("Mapping Accuracy", "96%", delta="+18%")
-
-    with col2:
-        st.subheader("📈 Knowledge Base Stats")
-        import pandas as pd
-        import plotly.express as px
-
-        stats = pd.DataFrame({
-            "Source": ["CSV Mappings", "ADR Documents", "Total Chunks"],
-            "Count": [20, 8, 28]
-        })
-        fig = px.bar(stats, x="Source", y="Count",
-                    title="Knowledge Base Composition",
-                    color="Source")
-        st.plotly_chart(fig, use_container_width=True)
+    user_id = st.text_input("User ID", value="demo_user")
+    system_filter = st.text_input("System Filter", value="CoreBanking")
 
     st.divider()
-    st.subheader("🏢 Systems Covered")
-    systems = pd.DataFrame({
-        "System": ["CoreBanking_v1", "CoreBanking_v2", "CRM_Oracle",
-                   "CRM_SAP", "PaymentSystem_v2", "LoanSystem_v1", "HRMS_Oracle"],
-        "Mappings": [4, 2, 4, 3, 3, 3, 1],
-        "Status": ["✅ Active"] * 7
-    })
-    st.dataframe(systems, use_container_width=True)
 
-# ── TAB 3: KNOWLEDGE BASE ─────────────────────────────────────────
-with tab3:
-    st.header("📚 Mapping Knowledge Base")
-    st.caption("All ingested mapping records and ADRs")
+    st.markdown("### Try these questions")
 
-    if os.path.exists("data/chunks_cache.pkl"):
-        import pickle
-        with open("data/chunks_cache.pkl", "rb") as f:
-            chunks = pickle.load(f)
+    st.code("How should we map customer account balance from CoreBanking?")
+    st.code("What is the right mapping for customer account balance?")
+    st.code("How do we standardize date fields?")
+    st.code("What mapping patterns were rejected earlier?")
 
-        mapping_chunks = [c for c in chunks if c.metadata.get("doc_type") == "mapping"]
-        adr_chunks = [c for c in chunks if c.metadata.get("doc_type") == "adr"]
+query = st.text_area(
+    "Ask a mapping question",
+    value="How should we map customer account balance from CoreBanking?",
+    height=100,
+)
 
-        st.metric("Total Chunks", len(chunks))
-
-        st.subheader("📋 Mapping Records")
-        import pandas as pd
-        mapping_df = pd.DataFrame([{
-            "Source Field": c.metadata.get("source_field", ""),
-            "Target Field": c.metadata.get("target_field", ""),
-            "System": c.metadata.get("system", ""),
-            "Year": c.metadata.get("year", ""),
-            "Status": c.metadata.get("status", "")
-        } for c in mapping_chunks])
-        st.dataframe(mapping_df, use_container_width=True)
-
-        st.subheader("📜 ADR Documents")
-        for chunk in adr_chunks:
-            with st.expander(chunk.page_content[:60] + "..."):
-                st.text(chunk.page_content)
+if st.button("Ask MappingMind", type="primary"):
+    if not query.strip():
+        st.warning("Please enter a question.")
     else:
-        st.warning("Run ingestion first: python -m core.ingest")
+        with st.spinner("MappingMind is thinking..."):
+            result = ask_mappingmind(
+                query=query,
+                user_id=user_id,
+                system_filter=system_filter,
+            )
+
+            st.subheader("Answer")
+            st.write(result.get("answer", "No answer generated."))
+
+            st.subheader("Production Signals")
+
+            col1, col2, col3, col4 = st.columns(4)
+
+            with col1:
+                st.metric(
+                    label="Cache Hit",
+                    value=str(result.get("cache_hit", False)),
+                    help="Shows whether the answer came from semantic cache.",
+                )
+
+            with col2:
+                st.metric(
+                    label="Rewrites",
+                    value=result.get("rewrites", 0),
+                    help="Shows how many times the agent rewrote the query.",
+                )
+
+            with col3:
+                st.metric(
+                    label="Hallucination Score",
+                    value=result.get("hallucination_score", "N/A"),
+                    help="Lower risk means answer is more grounded in retrieved evidence.",
+                )
+
+            with col4:
+                st.metric(
+                    label="Decision",
+                    value=result.get("decision", "answered"),
+                    help="Final routing decision: answered, blocked, human_review, or cache_hit.",
+                )
+
+            if result.get("cache_similarity") is not None:
+                st.info(
+                    f"Semantic cache matched previous query with similarity "
+                    f"{result.get('cache_similarity')}. "
+                    f"Cached from: {result.get('cached_from_query')}"
+                )
+
+            st.subheader("Sources Used")
+            show_sources(result.get("sources", []))
+
+            st.subheader("Agent Trace")
+            show_agent_trace(result.get("agent_trace", []))
+
+            with st.expander("Raw Result JSON"):
+                st.json(result)
+
+st.divider()
+st.subheader("Recent Audit Events")
+
+recent_events = read_recent_audit_events(limit=5)
+
+if recent_events:
+    for event in reversed(recent_events):
+        title = f"{event.get('decision', 'unknown')} | {event.get('query', '')[:80]}"
+        with st.expander(title):
+            st.json(event)
+else:
+    st.info("No audit events found yet. Ask a question first.")
