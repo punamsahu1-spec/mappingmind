@@ -1,4 +1,6 @@
 echo .env >> .gitignore
+echo .env.* >> .gitignore
+echo !.env.example >> .gitignore
 echo venv/ >> .gitignore
 echo .venv/ >> .gitignore
 echo __pycache__/ >> .gitignore
