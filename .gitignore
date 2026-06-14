@@ -1,4 +1,13 @@
-GOOGLE_API_KEY=your_google_api_key_here
-LANGSMITH_API_KEY=your_langsmith_api_key_here
-LANGSMITH_PROJECT=mappingmind
-LANGCHAIN_TRACING_V2=true
+.env
+.env.*
+!.env.example
+
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+data/chroma_store/
+*.pkl
+logs/
+data/semantic_cache.json
