@@ -6,7 +6,7 @@
 
 Learn to build a modern AI system from the ground up through hands-on implementation.
 
-Master the most in-demand AI engineering skills: RAG, hybrid search, embeddings, vector databases, reranking, prompt engineering, context engineering, guardrails, evaluation, monitoring foundations, caching foundations, and Agentic RAG.
+Master the most in-demand AI engineering skills: RAG, hybrid search, embeddings, vector databases, reranking, MMR, prompt engineering, context engineering, guardrails, evaluation, audit logging, semantic cache, monitoring foundations, and Agentic RAG.
 
 ![Python](https://img.shields.io/badge/Python-3.12+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-API-green)
@@ -14,6 +14,10 @@ Master the most in-demand AI engineering skills: RAG, hybrid search, embeddings,
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-purple)
 ![RAG](https://img.shields.io/badge/RAG-Production_Ready-orange)
 ![Agentic AI](https://img.shields.io/badge/Agentic_AI-LangGraph_Style-black)
+
+---
+
+## System Architecture
 
 ![MappingMind Architecture](docs/images/mappingmind_architecture.png)
 
@@ -23,23 +27,23 @@ Master the most in-demand AI engineering skills: RAG, hybrid search, embeddings,
 
 This is a learner-focused project where you build a complete enterprise data mapping assistant that understands mapping sheets, transformation rules, architecture decision records, and past implementation decisions.
 
-MappingMind teaches you to build a production-style RAG system using practical engineering patterns. Unlike basic tutorials that jump straight to “chat with documents,” this project follows the professional path: start with clean application structure, build ingestion, add keyword retrieval, add semantic retrieval, combine both with hybrid search, improve precision with reranking, and then wrap the full system with Agentic RAG, guardrails, evaluation, monitoring, and production-hardening patterns.
+MappingMind teaches you to build a production-style RAG system using practical engineering patterns. Unlike basic tutorials that jump straight to “chat with documents,” this project follows the professional path: start with clean application structure, build ingestion, add keyword retrieval, add semantic retrieval, combine both with hybrid search, improve precision with reranking, improve diversity with MMR, and then wrap the full system with Agentic RAG, guardrails, evaluation, semantic cache, audit logging, and production-hardening patterns.
 
-> The Professional Difference: We build RAG systems the way successful enterprise teams do — strong retrieval foundations enhanced with AI, not AI-first demos that ignore search quality, evidence control, and governance.
+> The Professional Difference: We build RAG systems the way successful enterprise teams do — strong retrieval foundations enhanced with AI, not AI-first demos that ignore search quality, evidence control, safety, and governance.
 
 By the end of this project, you will have your own AI-powered enterprise mapping assistant and the technical skills to explain production Agentic RAG systems for any enterprise domain.
 
 ---
 
-### What You'll Build
+## What You'll Build
 
-* Week 1: Complete application foundation with FastAPI, Streamlit, virtual environment, safe configuration, and project structure
+* Week 1: Application foundation with FastAPI, Streamlit, virtual environment, safe configuration, and project structure
 * Week 2: Data ingestion pipeline for mapping CSVs and architecture decision records
 * Week 3: BM25 keyword search for exact field names, mapping rules, and transformation terms
-* Week 4: Chunking and hybrid search foundation with embeddings, ChromaDB, and semantic retrieval
+* Week 4: Chunking, embeddings, ChromaDB, hybrid search, RRF, reranking, and MMR
 * Week 5: Complete RAG pipeline with Gemini LLM, grounded answers, citations, and Streamlit interface
-* Week 6: Production monitoring and caching foundations with RAGAS evaluation, LangSmith-ready tracing, and optimization roadmap
-* Week 7: Agentic RAG with guardrails, evidence grading, query rewriting, validation, and SME review escalation
+* Week 6: Production hardening with RAGAS evaluation, audit logging, semantic cache, and dashboard visibility
+* Week 7: Agentic RAG with guardrails, evidence grading, query rewriting, answer validation, and SME review escalation
 
 ---
 
@@ -49,7 +53,7 @@ By the end of this project, you will have your own AI-powered enterprise mapping
 
 ![MappingMind Architecture](docs/images/mappingmind_architecture.png)
 
-Complete Week 7 architecture showing how the enterprise data mapping assistant connects the dashboard, API layer, Agentic RAG workflow, hybrid retrieval, reranking, grounded generation, validation, and production hardening roadmap.
+Complete Week 7 architecture showing how the enterprise data mapping assistant connects the dashboard, API layer, Agentic RAG workflow, hybrid retrieval, reranking, grounded generation, validation, audit logging, semantic cache, and production hardening roadmap.
 
 ---
 
@@ -59,15 +63,15 @@ Complete Week 7 architecture showing how the enterprise data mapping assistant c
 
 Detailed agentic workflow showing decision nodes, document grading, adaptive retrieval, query rewriting, answer validation, and SME review escalation.
 
-Key Innovations in Week 7:
+Key innovations:
 
-* Intelligent Decision-Making: The agent evaluates whether to answer, retry, block, or escalate
-* Document Grading: Retrieved context is checked before generation
-* Query Rewriting: Weak queries are refined and retried
-* Guardrails: Prompt-injection and out-of-domain detection reduce unsafe behavior
-* Grounding Validation: Answers are checked against retrieved evidence
-* SME Review: Weak or unsupported answers are escalated instead of hallucinated
-* Transparency: Full agent trace is available for debugging and trust
+* Intelligent decision-making: the agent evaluates whether to answer, retry, block, or escalate
+* Document grading: retrieved context is checked before generation
+* Query rewriting: weak queries are refined and retried
+* Guardrails: prompt-injection and out-of-domain detection reduce unsafe behavior
+* Grounding validation: answers are checked against retrieved evidence
+* SME review: weak or unsupported answers are escalated instead of hallucinated
+* Transparency: full agent trace is available for debugging and trust
 
 ---
 
@@ -147,55 +151,27 @@ streamlit run dashboard/app.py
 
 ---
 
-### Weekly Learning Path
+## Weekly Learning Path
 
-| Week   | Topic                                                                                                     | Status     | Code Area                                                                |
-| ------ | --------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------ |
-| Week 1 | [Infrastructure Foundation](#week-1-infrastructure-foundation-)                                           | ✅ Complete | `api/`, `dashboard/`, `core/`, `.env.example`, `requirements.txt`        |
-| Week 2 | [Data Ingestion Pipeline](#week-2-data-ingestion-pipeline-)                                               | ✅ Complete | `core/ingest.py`, `data/`, ChromaDB                                      |
-| Week 3 | [Keyword Search First - The Critical Foundation](#week-3-keyword-search-first---the-critical-foundation-) | ✅ Complete | `core/retrieval.py`                                                      |
-| Week 4 | [Chunking & Hybrid Search - The Semantic Layer](#week-4-chunking--hybrid-search---the-semantic-layer-)    | ✅ Complete | `core/ingest.py`, `core/retrieval.py`, ChromaDB                          |
-| Week 5 | [Complete RAG Pipeline with LLM Integration](#week-5-complete-rag-pipeline-with-llm-integration-)         | ✅ Complete | `core/generation.py`, `dashboard/app.py`                                 |
-| Week 6 | [Production Monitoring and Caching](#week-6-production-monitoring-and-caching-)                           | ✅ Complete | `core/evaluation.py`, LangSmith-ready config, monitoring/caching roadmap |
-| Week 7 | [Agentic RAG and Guardrails](#week-7-agentic-rag--guardrails-)                                            | ✅ Complete | `core/agent.py`, `core/guardrails.py`                                    |
-
----
-
-### Clone a Specific Week Release
-
-Weekly tags are planned for learning checkpoints. After tags are created, use this pattern:
-
-```bash
-# Clone a specific week's code
-git clone --branch <WEEK_TAG> https://github.com/punamsahu1-spec/mappingmind.git
-cd mappingmind
-
-# Replace <WEEK_TAG> with: week1.0, week2.0, week3.0, etc.
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-Suggested future tags:
-
-```text
-week1.0-infra-foundation
-week2.0-data-ingestion
-week3.0-keyword-search
-week4.0-hybrid-search
-week5.0-complete-rag
-week6.0-monitoring-caching
-week7.0-agentic-rag
-```
+| Week   | Topic                                                                                                     | Status     | Code Area                                                                 |
+| ------ | --------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------- |
+| Week 1 | [Infrastructure Foundation](#week-1-infrastructure-foundation-)                                           | ✅ Complete | `api/`, `dashboard/`, `core/`, `.env.example`, `requirements.txt`         |
+| Week 2 | [Data Ingestion Pipeline](#week-2-data-ingestion-pipeline-)                                               | ✅ Complete | `core/ingest.py`, `data/`, ChromaDB                                       |
+| Week 3 | [Keyword Search First - The Critical Foundation](#week-3-keyword-search-first---the-critical-foundation-) | ✅ Complete | `core/retrieval.py`                                                       |
+| Week 4 | [Chunking & Hybrid Search - The Semantic Layer](#week-4-chunking--hybrid-search---the-semantic-layer-)    | ✅ Complete | `core/ingest.py`, `core/retrieval.py`, ChromaDB                           |
+| Week 5 | [Complete RAG Pipeline with LLM Integration](#week-5-complete-rag-pipeline-with-llm-integration-)         | ✅ Complete | `core/generation.py`, `dashboard/app.py`                                  |
+| Week 6 | [Production Monitoring and Caching](#week-6-production-monitoring-and-caching-)                           | ✅ Complete | `core/evaluation.py`, `core/audit.py`, `core/cache.py`, dashboard signals |
+| Week 7 | [Agentic RAG and Guardrails](#week-7-agentic-rag--guardrails-)                                            | ✅ Complete | `core/agent.py`, `core/guardrails.py`                                     |
 
 ---
 
-### Access Your Services
+## Access Your Services
 
 | Service              | URL / Command                  | Purpose                              |
 | -------------------- | ------------------------------ | ------------------------------------ |
 | API Documentation    | `http://127.0.0.1:8000/docs`   | Interactive API testing              |
 | Health Check         | `http://127.0.0.1:8000/health` | Verify backend service is running    |
+| Ask API              | `POST /ask`                    | Ask MappingMind a mapping question   |
 | Streamlit Dashboard  | `http://localhost:8501`        | User-friendly MappingMind interface  |
 | Knowledge Ingestion  | `python core/ingest.py`        | Load mapping knowledge into ChromaDB |
 | Evaluation Module    | `python core/evaluation.py`    | Run RAGAS-style evaluation checks    |
@@ -220,46 +196,39 @@ Start here. Master the application foundation that powers modern RAG systems.
 
 ![MappingMind Architecture](docs/images/mappingmind_architecture.png)
 
-Infrastructure Components:
+Infrastructure components:
 
-* FastAPI: REST API layer with root and health endpoints
-* Streamlit: User-facing dashboard for asking mapping questions
-* Core AI Modules: Agent, retrieval, generation, guardrails, evaluation
-* Environment Layer: `.env.example` for safe configuration
-* Local Runtime: Python virtual environment and dependency management
+* FastAPI: REST API layer with root, health, and ask endpoints
+* Streamlit: user-facing dashboard for asking mapping questions
+* Core AI modules: agent, retrieval, generation, guardrails, cache, audit, and evaluation
+* Environment layer: `.env.example` for safe configuration
+* Local runtime: Python virtual environment and dependency management
 
 ### Setup Guide
 
 ```bash
-# Create virtual environment
 python -m venv venv
-
-# Activate virtual environment on Windows
 venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Create local env file
 copy .env.example .env
 ```
 
-Completion Guide:
+### Completion Guide
 
 * Confirm the repo has `api/`, `core/`, `dashboard/`, and `data/`
-* Confirm FastAPI can start with `uvicorn api.main:app --reload`
-* Confirm dashboard can start with `streamlit run dashboard/app.py`
+* Confirm FastAPI starts with `uvicorn api.main:app --reload`
+* Confirm dashboard starts with `streamlit run dashboard/app.py`
 * Confirm `.env` is local only and `.env.example` is tracked
 
 ### Deep Dive
 
-The most important production design choice in Week 1 is separation of concerns. The UI should not contain retrieval logic. The API should not contain prompt engineering. The agent should orchestrate the workflow, while retrieval, generation, guardrails, and evaluation remain separate modules.
+The most important production design choice in Week 1 is separation of concerns. The UI should not contain retrieval logic. The API should not contain prompt engineering. The agent should orchestrate the workflow, while retrieval, generation, guardrails, audit, cache, and evaluation remain separate modules.
 
 ---
 
 ## Week 2: Data Ingestion Pipeline ✅
 
-Building on Week 1 infrastructure: Learn to process enterprise mapping knowledge into a searchable knowledge base.
+Building on Week 1 infrastructure: learn to process enterprise mapping knowledge into a searchable knowledge base.
 
 ### Learning Objectives
 
@@ -275,7 +244,7 @@ Building on Week 1 infrastructure: Learn to process enterprise mapping knowledge
 
 ![Ingestion Pipeline](docs/images/ingestion_pipeline.png)
 
-Data Pipeline Components:
+Data pipeline components:
 
 | Component                | Current Implementation                                    |
 | ------------------------ | --------------------------------------------------------- |
@@ -290,17 +259,16 @@ Data Pipeline Components:
 ### Implementation Guide
 
 ```bash
-# Run ingestion
 python core/ingest.py
 ```
 
-Completion Guide:
+### Completion Guide
 
-* Mapping CSV rows should load successfully
-* ADR documents should load successfully
-* ADR documents should be chunked
-* ChromaDB store should be created locally
-* Chunk cache should be created locally
+* Mapping CSV rows load successfully
+* ADR documents load successfully
+* ADR documents are chunked
+* ChromaDB store is created locally
+* Chunk cache is created locally but ignored by Git
 
 ### Deep Dive
 
@@ -310,7 +278,7 @@ Better ingestion creates better retrieval. Poorly prepared documents lead to wea
 
 ## Week 3: Keyword Search First - The Critical Foundation ✅
 
-Building on Weeks 1-2 foundation: Implement the keyword search foundation that professional RAG systems rely on.
+Building on Weeks 1-2 foundation: implement the keyword search foundation that professional RAG systems rely on.
 
 ### Learning Objectives
 
@@ -325,21 +293,20 @@ Building on Weeks 1-2 foundation: Implement the keyword search foundation that p
 
 ![Retrieval Pipeline](docs/images/retrieval_pipeline.png)
 
-Search Infrastructure Components:
+Search infrastructure components:
 
-* BM25 Retriever: Finds exact terms, field names, and transformation patterns
-* Mapping Corpus: Searchable text from mapping records and ADR chunks
-* Relevance Scores: Keyword-based ranking signal
-* Retrieval Baseline: Foundation for hybrid retrieval
+* BM25 retriever: finds exact terms, field names, and transformation patterns
+* Mapping corpus: searchable text from mapping records and ADR chunks
+* Relevance scores: keyword-based ranking signal
+* Retrieval baseline: foundation for hybrid retrieval
 
 ### Setup Guide
 
 ```bash
-# Run retrieval tests or execute retrieval module
 python core/retrieval.py
 ```
 
-Completion Guide:
+### Completion Guide
 
 * Test a query with an exact source-field name
 * Verify that keyword retrieval surfaces relevant mapping records
@@ -353,7 +320,7 @@ Enterprise RAG cannot rely only on embeddings. Field names, abbreviations, table
 
 ## Week 4: Chunking & Hybrid Search - The Semantic Layer ✅
 
-Building on Week 3 foundation: Add the semantic layer that makes search understand business meaning.
+Building on Week 3 foundation: add the semantic layer that makes search understand business meaning.
 
 ### Learning Objectives
 
@@ -362,46 +329,46 @@ Building on Week 3 foundation: Add the semantic layer that makes search understa
 * Retrieve conceptually similar mapping examples
 * Compare keyword search with semantic search
 * Combine BM25 and vector search using RRF fusion
-* Understand why hybrid retrieval improves production RAG quality
+* Rerank results using a cross-encoder
+* Apply MMR to reduce duplicate context
 
 ### Architecture Overview
 
 ![Retrieval Pipeline](docs/images/retrieval_pipeline.png)
 
-Hybrid Search Infrastructure Components:
+Hybrid search infrastructure components:
 
-* Text Chunker: Splits ADRs and mapping documents into retrievable units
-* Embedding Model: Converts mapping knowledge into vectors
-* ChromaDB: Stores vector embeddings for semantic retrieval
-* BM25 Search: Retrieves exact terms and technical identifiers
-* RRF Fusion: Combines keyword and semantic rankings
-* Unified Retrieval Function: Returns candidate evidence for reranking
+* Text chunker: splits ADRs and mapping documents into retrievable units
+* Embedding model: converts mapping knowledge into vectors
+* ChromaDB: stores vector embeddings for semantic retrieval
+* BM25 search: retrieves exact terms and technical identifiers
+* RRF fusion: combines keyword and semantic rankings
+* Cross-encoder reranker: improves precision of final evidence
+* MMR diversity selection: reduces near-duplicate chunks before generation
 
 ### Setup Guide
 
 ```bash
-# Rebuild knowledge base
 python core/ingest.py
-
-# Test retrieval pipeline
 python core/retrieval.py
 ```
 
-Completion Guide:
+### Completion Guide
 
 * Compare keyword-only, vector-only, and hybrid retrieval results
 * Confirm field-name and business-language queries both work
-* Confirm fused results are passed forward for reranking
+* Confirm fused results are reranked
+* Confirm MMR adds diverse final context
 
 ### Deep Dive
 
-Hybrid retrieval is often the practical production default. BM25 captures exact technical precision. Vector search captures meaning. RRF balances both result sets without requiring one search mode to dominate the other.
+Hybrid retrieval is often the practical production default. BM25 captures exact technical precision. Vector search captures meaning. RRF balances both result sets. Reranking improves precision, and MMR improves diversity so the LLM receives richer evidence instead of repeated chunks.
 
 ---
 
 ## Week 5: Complete RAG Pipeline with LLM Integration ✅
 
-Building on Week 4 hybrid search: Add the LLM layer that turns search into grounded enterprise answers.
+Building on Week 4 hybrid search: add the LLM layer that turns search into grounded enterprise answers.
 
 ### Learning Objectives
 
@@ -416,31 +383,28 @@ Building on Week 4 hybrid search: Add the LLM layer that turns search into groun
 
 ![MappingMind Architecture](docs/images/mappingmind_architecture.png)
 
-Complete RAG Infrastructure Components:
+Complete RAG infrastructure components:
 
-* Retrieval Pipeline: BM25 + vector search + RRF
-* Cross-Encoder Reranker: Improves evidence precision
-* Context Builder: Formats cited evidence for the LLM
-* Gemini LLM: Generates grounded answers
-* System Prompt: Restricts the answer to retrieved context
-* Dashboard: Shows answer, sources, metrics, and trace
+* Retrieval pipeline: BM25 + vector search + RRF + reranker + MMR
+* Context builder: formats cited evidence for the LLM
+* Gemini LLM: generates grounded answers
+* System prompt: restricts the answer to retrieved context
+* Guardrails: checks prompt injection and grounding risk
+* Dashboard: shows answer, sources, metrics, trace, cache, and audit events
 
 ### Setup Guide
 
 ```bash
-# Run ingestion first
 python core/ingest.py
-
-# Start dashboard
 streamlit run dashboard/app.py
 ```
 
-Completion Guide:
+### Completion Guide
 
 * Ask a mapping question in the dashboard
 * Verify that the answer includes source evidence
 * Verify that retrieved sources are visible
-* Verify that the system refuses or escalates weak evidence
+* Verify that the system refuses, blocks, or escalates weak evidence
 
 ### Deep Dive
 
@@ -450,56 +414,57 @@ The LLM is not the knowledge source. The retrieved context is the knowledge sour
 
 ## Week 6: Production Monitoring and Caching ✅
 
-Building on Week 5 complete RAG system: Add production monitoring foundations, evaluation, and performance optimization patterns.
+Building on Week 5 complete RAG system: add production monitoring foundations, evaluation, audit logging, and performance optimization.
 
 ### Learning Objectives
 
 * Understand why production RAG requires observability
-* Track query behavior, answer quality, and retrieval decisions
+* Track query behavior, answer quality, retrieval decisions, and agent trace
 * Prepare for LangSmith or Langfuse tracing
 * Run RAGAS-style evaluation for answer quality
-* Prepare semantic caching for repeated questions
-* Track cost and latency optimization opportunities
+* Use semantic caching for repeated questions
+* Track audit events for governance and debugging
 
 ### Architecture Overview
 
 ![Production Hardening Roadmap](docs/images/production_hardening_roadmap.png)
 
-Production Monitoring and Caching Components:
+Production monitoring and caching components:
 
-| Component | Current Status |
-|---|---|
-| RAGAS Evaluation | ✅ Implemented in `core/evaluation.py` |
-| Faithfulness Metric | ✅ Implemented |
-| Answer Relevancy Metric | ✅ Implemented |
-| LangSmith Config | ✅ Environment variables present |
-| Persistent Audit Log | ✅ Implemented with JSONL |
-| Semantic Cache | ✅ Implemented with embedding similarity |
-| Monitoring Foundation | ✅ Dashboard shows cache, decision, trace, and audit events |
-| Cost / Latency Dashboard | 🟡 Basic signals implemented; detailed trends planned |
+| Component                | Current Status                                                |
+| ------------------------ | ------------------------------------------------------------- |
+| RAGAS Evaluation         | ✅ Implemented in `core/evaluation.py`                         |
+| Faithfulness Metric      | ✅ Implemented                                                 |
+| Answer Relevancy Metric  | ✅ Implemented                                                 |
+| LangSmith Config         | ✅ Environment variables present                               |
+| Persistent Audit Log     | ✅ Implemented with local JSONL                                |
+| Semantic Cache           | ✅ Implemented with embedding similarity                       |
+| Monitoring Foundation    | ✅ Dashboard shows cache, decision, trace, and audit events    |
+| Cost / Latency Dashboard | 🟡 Basic signals implemented; detailed trends can be expanded |
+
 ### Setup Guide
 
 ```bash
-# Run RAGAS-style evaluation
 python core/evaluation.py
 ```
 
-Completion Guide:
+### Completion Guide
 
 * Run evaluation after ingestion
 * Confirm evaluation produces faithfulness and answer relevancy scores
-* Confirm results are saved under `data/eval_results/`
-* Keep generated evaluation output out of Git if it is local-only
+* Confirm audit events are written to `logs/audit.jsonl`
+* Confirm semantic cache is written to `data/semantic_cache.json`
+* Confirm generated outputs are ignored by Git
 
 ### Deep Dive
 
-Production monitoring is not just logging the final answer. A production RAG system should trace the full path: query, retrieval mode, retrieved chunks, reranking, prompt, model response, validation result, latency, and final decision.
+Production monitoring is not just logging the final answer. A production RAG system should trace the full path: query, retrieval mode, retrieved chunks, reranking, MMR, prompt, model response, validation result, cache status, and final decision.
 
 ---
 
 ## Week 7: Agentic RAG & Guardrails ✅
 
-Building on Week 6 monitoring foundation: Add agentic decisioning, retries, validation, and safety.
+Building on Week 6 monitoring foundation: add agentic decisioning, retries, validation, and safety.
 
 ### Learning Objectives
 
@@ -515,27 +480,24 @@ Building on Week 6 monitoring foundation: Add agentic decisioning, retries, vali
 
 ![Agentic RAG Workflow](docs/images/agentic_rag_workflow.png)
 
-Agentic RAG Components:
+Agentic RAG components:
 
-* Guard Node: Detects prompt injection and domain violations
-* Retrieve Node: Runs hybrid retrieval
-* Grade Documents Node: Checks whether retrieved evidence is strong enough
-* Rewrite Query Node: Improves weak queries and retries retrieval
-* Generate Answer Node: Produces grounded response from retrieved context
-* Validate Answer Node: Checks grounding and hallucination risk
-* SME Review Path: Escalates weak or unsupported answers
+* Guard node: detects prompt injection and domain violations
+* Retrieve node: runs hybrid retrieval
+* Grade documents node: checks whether retrieved evidence is strong enough
+* Rewrite query node: improves weak queries and retries retrieval
+* Generate answer node: produces grounded response from retrieved context
+* Validate answer node: checks grounding and hallucination risk
+* SME review path: escalates weak or unsupported answers
 
 ### Setup Guide
 
 ```bash
-# Run the agent workflow directly
 python core/agent.py
-
-# Or run through dashboard
 streamlit run dashboard/app.py
 ```
 
-Completion Guide:
+### Completion Guide
 
 * Test a normal mapping question
 * Test a weak-evidence question
@@ -563,13 +525,16 @@ Agentic RAG is useful when the system needs control decisions. Basic RAG retriev
 | Keyword Search | BM25                      | Exact field and term matching                |
 | Fusion         | Reciprocal Rank Fusion    | Combines keyword and vector results          |
 | Reranking      | Cross-Encoder             | Improves final evidence precision            |
+| Diversity      | MMR                       | Reduces duplicate context                    |
 | Guardrails     | Custom Python checks      | Prompt injection and domain safety           |
+| Cache          | Semantic cache            | Reduces latency and repeated LLM calls       |
+| Audit          | JSONL audit log           | Governance and traceability                  |
 | Evaluation     | RAGAS + custom test cases | Faithfulness and answer relevancy checks     |
 | Observability  | LangSmith-ready config    | Future tracing and monitoring                |
 
 ---
 
-### Project Structure
+## Project Structure
 
 ```text
 mappingmind/
@@ -577,6 +542,8 @@ mappingmind/
     main.py
   core/
     agent.py
+    audit.py
+    cache.py
     evaluation.py
     generation.py
     guardrails.py
@@ -586,8 +553,6 @@ mappingmind/
     app.py
   data/
     mappings.csv
-    chroma_store/
-    chunks_cache.pkl
   docs/
     images/
       mappingmind_architecture.png
@@ -601,21 +566,28 @@ mappingmind/
   README.md
 ```
 
+Generated local files are intentionally ignored by Git:
+
+```text
+data/chroma_store/
+data/chunks_cache.pkl
+data/eval_results/
+data/semantic_cache.json
+logs/audit.jsonl
+```
+
 ---
 
-### API Endpoint Reference
+## API Endpoint Reference
 
-| Endpoint   | Method | Purpose                                           |
-| ---------- | ------ | ------------------------------------------------- |
-| `/`        | GET    | Root service information                          |
-| `/health`  | GET    | Health check                                      |
-| `/docs`    | GET    | FastAPI interactive documentation                 |
-| `/ask`     | POST   | Planned endpoint for asking MappingMind questions |
-| `/ingest`  | POST   | Planned endpoint for triggering ingestion         |
-| `/metrics` | GET    | Planned endpoint for service and query metrics    |
-| `/eval`    | POST   | Planned endpoint for running evaluation           |
+| Endpoint  | Method | Purpose                                 |
+| --------- | ------ | --------------------------------------- |
+| `/`       | GET    | Root service information                |
+| `/health` | GET    | Health check                            |
+| `/docs`   | GET    | FastAPI interactive documentation       |
+| `/ask`    | POST   | Ask MappingMind a data-mapping question |
 
-Planned `/ask` request body:
+Example `/ask` request body:
 
 ```json
 {
@@ -625,21 +597,21 @@ Planned `/ask` request body:
 }
 ```
 
-Planned `/ask` response body:
+Example `/ask` response body:
 
 ```json
 {
   "answer": "Recommended mapping with transformation logic...",
   "sources": ["mappings.csv", "ADR-001"],
   "agent_trace": ["guard", "retrieve", "grade", "generate", "validate"],
-  "grounding_score": 0.86,
+  "cache_hit": false,
   "decision": "answered"
 }
 ```
 
 ---
 
-### Essential Commands
+## Essential Commands
 
 ```bash
 # Create virtual environment
@@ -660,6 +632,9 @@ copy .env.example .env
 # Run ingestion
 python core/ingest.py
 
+# Run retrieval
+python core/retrieval.py
+
 # Run API
 uvicorn api.main:app --reload
 
@@ -675,7 +650,7 @@ git status
 
 ---
 
-### Target Audience
+## Target Audience
 
 This project is designed for:
 
@@ -688,43 +663,22 @@ This project is designed for:
 
 ---
 
-### Troubleshooting
+## Troubleshooting
 
-| Problem                              | Likely Cause                                   | Fix                                             |
-| ------------------------------------ | ---------------------------------------------- | ----------------------------------------------- |
-| Gemini call fails                    | Missing or invalid `GOOGLE_API_KEY`            | Update `.env` with a valid key                  |
-| `.env` appears in GitHub             | File was tracked before `.gitignore` was fixed | Run `git rm --cached --sparse .env` and push    |
-| ChromaDB has stale data              | Old local vector store                         | Delete `data/chroma_store/` and rerun ingestion |
-| Streamlit cannot import core modules | Wrong working directory                        | Run commands from repo root                     |
-| FastAPI does not start               | Missing dependencies                           | Run `pip install -r requirements.txt`           |
-| Evaluation gives weak results        | Knowledge base not ingested                    | Run `python core/ingest.py` first               |
-| Prompt-injection test is not blocked | Guardrail patterns need update                 | Extend `core/guardrails.py` patterns            |
-
----
-
-### Get Help
-
-If something fails:
-
-1. Check that your virtual environment is activated.
-2. Confirm `.env` exists locally and contains keys.
-3. Run ingestion before running the dashboard.
-4. Run commands from the project root.
-5. Check `git status` before committing.
-6. Review generated files and ensure `.env`, cache, logs, and ChromaDB store are not committed.
-
-Useful local checks:
-
-```bash
-git status
-git ls-files | findstr ".env"
-python --version
-pip list
-```
+| Problem                              | Likely Cause                                   | Fix                                                           |
+| ------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------- |
+| Gemini call fails                    | Missing or invalid `GOOGLE_API_KEY`            | Update `.env` with a valid key                                |
+| `.env` appears in GitHub             | File was tracked before `.gitignore` was fixed | Run `git rm --cached --sparse .env` and push                  |
+| ChromaDB has stale data              | Old local vector store                         | Delete `data/chroma_store/` and rerun ingestion               |
+| Streamlit cannot import core modules | Wrong working directory or missing path setup  | Run from repo root and ensure dashboard adds root to path     |
+| FastAPI does not start               | Missing dependencies or import error           | Run `pip install -r requirements.txt` and check console error |
+| Evaluation gives weak results        | Knowledge base not ingested                    | Run `python core/ingest.py` first                             |
+| Prompt-injection test is not blocked | Guardrail patterns need update                 | Extend `core/guardrails.py` patterns                          |
+| Cache does not hit                   | Similarity threshold too high                  | Lower `SEMANTIC_CACHE_THRESHOLD` in `.env`                    |
 
 ---
 
-### Cost Structure
+## Cost Structure
 
 MappingMind is designed to run with minimal cost.
 
@@ -737,6 +691,9 @@ MappingMind is designed to run with minimal cost.
 | Sentence Transformers embeddings | Free locally              |
 | BM25 retrieval                   | Free                      |
 | Cross-Encoder reranking          | Free locally              |
+| MMR                              | Free locally              |
+| Semantic cache                   | Free locally              |
+| JSONL audit log                  | Free locally              |
 | Gemini API                       | Depends on API usage      |
 | LangSmith                        | Optional; depends on plan |
 | GitHub hosting                   | Free for public repo      |
@@ -746,7 +703,7 @@ Recommended low-cost usage:
 * Use small sample documents during development
 * Keep top-k retrieval small
 * Use reranking only on shortlisted chunks
-* Add semantic cache before scaling repeated queries
+* Use semantic cache for repeated questions
 * Track token usage when moving beyond demo mode
 
 ---
@@ -758,6 +715,7 @@ Recommended low-cost usage:
 * Rotate API keys if they were ever committed
 * Keep vector stores, cache files, logs, and generated files out of Git
 * Add role-based filtering before using real enterprise data
+* Upgrade local audit/cache stores to managed services for enterprise deployment
 
 Recommended `.gitignore` entries:
 
@@ -774,9 +732,10 @@ __pycache__/
 data/chroma_store/
 data/chunks_cache.pkl
 data/eval_results/
-*.pkl
-logs/
 data/semantic_cache.json
+*.pkl
+
+logs/
 ```
 
 ---
@@ -788,13 +747,11 @@ MappingMind is a portfolio-grade production RAG prototype, not a full enterprise
 Current limitations:
 
 * Uses sample data, not a real enterprise mapping repository
-* Prompt-injection defense is rule-based
-- Persistent audit logging is implemented using local JSONL logs
-- Semantic cache is implemented using embedding similarity for repeated questions
-- MMR diversity selection is implemented after reranking to reduce duplicate context
-- Audit, cache, and evaluation outputs are local files and can be upgraded to managed observability stores
+* Prompt-injection defense is rule-based and can be strengthened
+* Audit logging is local JSONL and can be upgraded to a managed database or observability platform
+* Semantic cache is local-file based and can be upgraded to Redis or a managed cache
 * Multi-tenant access control is not yet implemented
-* Full observability dashboard is not yet wired
+* Full cost and latency trend dashboard can be expanded
 * MCP and multi-agent workflows are intentionally out of scope for this phase
 
 ---
@@ -807,10 +764,13 @@ MappingMind helps you learn the practical implementation patterns behind modern 
 * semantic retrieval second
 * hybrid search for production quality
 * reranking for precision
-* agentic control flow for reliability
+* MMR for diverse context
+* grounded generation for trustworthy answers
 * guardrails for safety
+* semantic cache for latency and cost reduction
+* audit logs for governance
 * evaluation for regression checks
-* auditability for governance
+* dashboard visibility for production-style debugging
 
 Start with Week 1, build each layer step by step, and by Week 7 you will have a serious enterprise-grade GenAI portfolio project.
 
