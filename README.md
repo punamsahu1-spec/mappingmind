@@ -467,17 +467,16 @@ Building on Week 5 complete RAG system: Add production monitoring foundations, e
 
 Production Monitoring and Caching Components:
 
-| Component                | Current Status                                 |
-| ------------------------ | ---------------------------------------------- |
-| RAGAS Evaluation         | ✅ Implemented in `core/evaluation.py`          |
-| Faithfulness Metric      | ✅ Implemented                                  |
-| Answer Relevancy Metric  | ✅ Implemented                                  |
-| LangSmith Config         | ✅ Environment variables present                |
-| Monitoring Foundation    | ✅ Agent trace and evaluation outputs           |
-| Caching Foundation       | ✅ Roadmap defined; implementation planned next |
-| Persistent Audit Log     | ✅ Roadmap defined; implementation planned next |
-| Cost / Latency Dashboard | ✅ Roadmap defined; implementation planned next |
-
+| Component | Current Status |
+|---|---|
+| RAGAS Evaluation | ✅ Implemented in `core/evaluation.py` |
+| Faithfulness Metric | ✅ Implemented |
+| Answer Relevancy Metric | ✅ Implemented |
+| LangSmith Config | ✅ Environment variables present |
+| Persistent Audit Log | ✅ Implemented with JSONL |
+| Semantic Cache | ✅ Implemented with embedding similarity |
+| Monitoring Foundation | ✅ Dashboard shows cache, decision, trace, and audit events |
+| Cost / Latency Dashboard | 🟡 Basic signals implemented; detailed trends planned |
 ### Setup Guide
 
 ```bash
@@ -790,9 +789,10 @@ Current limitations:
 
 * Uses sample data, not a real enterprise mapping repository
 * Prompt-injection defense is rule-based
-* Persistent audit logging can be made stronger with JSONL/database storage
-* Semantic cache implementation is planned next
-* MMR diversity selection is planned next
+- Persistent audit logging is implemented using local JSONL logs
+- Semantic cache is implemented using embedding similarity for repeated questions
+- MMR diversity selection is implemented after reranking to reduce duplicate context
+- Audit, cache, and evaluation outputs are local files and can be upgraded to managed observability stores
 * Multi-tenant access control is not yet implemented
 * Full observability dashboard is not yet wired
 * MCP and multi-agent workflows are intentionally out of scope for this phase
