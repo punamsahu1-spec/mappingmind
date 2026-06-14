@@ -8,6 +8,8 @@ __pycache__/
 *.pyc
 
 data/chroma_store/
+data/chunks_cache.pkl
+data/eval_results/
 *.pkl
 logs/
 data/semantic_cache.json
