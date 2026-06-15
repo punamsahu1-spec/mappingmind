@@ -92,8 +92,8 @@ Key innovations:
 
 ```bash
 # 1. Clone and setup
-git clone https://github.com/punamsahu1-spec/mappingmind.git
-cd mappingmind
+git clone https://github.com/punamsahu1-spec/production-agentic-rag-data-mapping.git
+cd production-agentic-rag-data-mapping
 
 # 2. Create virtual environment
 python -m venv venv
